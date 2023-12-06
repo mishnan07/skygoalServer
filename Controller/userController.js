@@ -7,8 +7,8 @@ export const Register = async (req, res) => {
     try {
       let userDetails = req.body;
       const image = req.file ? req.file.filename : '';
-  
-      const user = await userModel.find({ email: userDetails.email });
+ 
+        const user = await userModel.find({ email: userDetails.email });
   
       if (user.length === 0) {
         userDetails.password = await bcrypt.hash(userDetails.password, 10);
