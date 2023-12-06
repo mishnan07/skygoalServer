@@ -40,16 +40,15 @@ export const Register = async (req, res) => {
       const findUser = await userModel.findOne({ email });
   
       if (!findUser) {
-        return res.status(200).json({ state: false, mess: 'User not found' });
+        return res.status(404).json({  mess: 'User not found' });
       }
   
       if (password) {
         const isPasswordMatch = await bcrypt.compare(password, findUser.password);
   
         if (!isPasswordMatch) {
-          return res
-            .status(200)
-            .json({ state: false, mess: 'Email or password is incorrect' });
+          return res.status(401).json({  mess: 'Email or password is incorrect' });
+
         }
   
         const token = generateAuthToken(findUser);
@@ -64,7 +63,7 @@ export const Register = async (req, res) => {
   
         return res.status(200).json({ userResponse });
       } else {
-        return res.json({ state: false, mess: 'Password is required' });
+        return res.json({  mess: 'Password is required' });
       }
     } catch (error) {
       console.error(error);
