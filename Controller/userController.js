@@ -85,3 +85,37 @@ export const GetData = async(req,res)=>{
 
     }
 }
+
+
+export const Edit = async (req, res) => {
+  try {
+    const userDetails = req.body;
+    let image = req.file  ? req.file.filename : '';
+ if(!image && userDetails.image){
+  image = userDetails.image
+ }
+
+    const user = await userModel.findOne({ email: userDetails.email });
+
+    if (!user) {
+      return res.status(404).json({ status: false, mes: 'User not found' });
+    }
+
+    const response = await userModel.findByIdAndUpdate(
+      user._id,
+      {
+        $set: {
+          name: userDetails.name,
+          email: userDetails.email,
+          profileImage: image || null,
+        },
+      },
+      { new: true } 
+    );
+
+    res.status(200).json({ status: true, result: response });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: false, mes: 'Internal server error' });
+  }
+};
