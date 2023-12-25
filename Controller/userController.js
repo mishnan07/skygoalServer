@@ -1,6 +1,8 @@
 import bcrypt from 'bcrypt';
 import userModel from '../Models/userModel.js';
 import { generateAuthToken } from '../Middleware/auth.js';
+import chapterModel from '../Models/chapterModel.js';
+import orderModel from '../Models/orderModel.js';
 
 
 export const Register = async (req, res) => {
@@ -17,6 +19,7 @@ export const Register = async (req, res) => {
           email: userDetails.email,
           password: userDetails.password,
           profileImage: image,
+          isAdmin:userDetails.userType==='user'?false:true
         });
   
         res.status(200).json({ status: true, result: userDetails });
@@ -35,7 +38,7 @@ export const Register = async (req, res) => {
   export const Login = async (req, res) => {
     try {
       const userDetails = req.body;
-      const { email, password } = userDetails;
+      const { email, password,userType } = userDetails;
   
       const findUser = await userModel.findOne({ email });
   
@@ -52,6 +55,7 @@ export const Register = async (req, res) => {
         }
   
         const token = generateAuthToken(findUser);
+
         const { name } = findUser;
   
         const userResponse = {
@@ -59,6 +63,7 @@ export const Register = async (req, res) => {
           status: true,
           token,
           name,
+          userType:userType
         };
   
         return res.status(200).json({ userResponse });
@@ -119,3 +124,33 @@ export const Edit = async (req, res) => {
     res.status(500).json({ status: false, mes: 'Internal server error' });
   }
 };
+
+
+export const getSelectedCourses = async (req, res) => {
+  try {
+    const courseId = req.params.courseId; // Use const or let to declare courseId
+    const chapters = await chapterModel.find({ courseId: courseId });
+   
+    res.status(200).json({ chapters });
+  } catch (error) {
+    res.status(500).json({ status: false, mes: 'Internal server error' });
+  }
+};
+
+
+export const userPurchased = async (req,res)=>{
+  try {
+    const userId = req.params.userId
+    const user = await userModel.findOne({ _id: userId });
+
+    if (user.PurchasedChapter) {
+      const purchasedChaptersIds = user.PurchasedChapter;
+      return res.status(200).json({purchasedChaptersIds})
+    }  
+     res.status(200).json({mes:'User not Purchased Chapters'})
+
+  } catch (error) {
+    res.status(500).json({ status: false, mes: 'Internal server error' });
+  }
+}
+

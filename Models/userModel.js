@@ -16,7 +16,12 @@ const userSchema = new mongoose.Schema({
   },
   profileImage: {
     type: String, 
+  },  
+  isAdmin:{
+    type:Boolean,
+    required:true
   },
+  PurchasedChapter:[String]
 });
 const userModel = mongoose.model("user", userSchema);
 export default userModel;
